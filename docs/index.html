@@ -1,0 +1,179 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0045)http://6.869.csail.mit.edu/fa19/schedule.html -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<link href="https://fonts.cdnfonts.com/css/chalkduster" rel="stylesheet">
+<style>
+    @import url('https://fonts.cdnfonts.com/css/chalkduster');
+</style>
+<script src="./assets/teaser-data.js"></script>
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>VideoLLM-online: Learning Large Language Model for Streaming Video</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <meta name="description"
+        content="Project page for &#39;VideoLLM-online: Learning Large Language Model for Streaming Video.&#39;">
+    <link rel="icon" href="./pics/wis_logo.jpg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>VideoLLM-online: Learning Large Language Model for Streaming Video</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <meta name="description"
+        content="Project page for &#39;VideoLLM-online: Learning Large Language Model for Streaming Video.&#39;">
+    <link rel="icon" href="./assets/wis_logo.jpeg">
+</head>
+
+<body>
+    <p class="title">VideoLLM-online: Learning Large Language Model for Streaming Video</p>
+    <div style="text-align: center; font-size: 20pt; margin-bottom: 15px">
+            <span>CVPR 2024</span>
+    </div>
+    <p class="author">
+        <span class="author"><a target="_blank" href="https://chenjoya.github.io/">Joya
+            Chen</a><sup>1</sup></span>
+        <span class="author"><a target="_blank" href="https://lvzhaoyang.github.io/">Zhaoyang
+            Lv</a><sup>2</sup></span>
+        <span class="author"><a target="_blank" href="https://">Shiwei
+            Wu</a><sup>1,3</sup></sup></span>
+        <span class="author"><a target="_blank" href="https://qinghonglin.github.io/">Kevin
+            Qinghong Lin</a><sup>1</sup></sup></span>
+        <span class="author"><a target="_blank" href="https://">Chenan
+            Song</a><sup>1</sup></sup></span>
+        <span class="author"><a target="_blank" href="https://">Difei
+            Gao</a><sup>1</sup></sup></span>
+        <span class="author"><a target="_blank" href="https://jia-wei-liu.github.io/">Jiawei
+            Liu</a><sup>1</sup></sup></span>
+        <span class="author"><a target="_blank" href="https://sebgao.github.io/">Ziteng
+            Gao</a><sup>1</sup></sup></span>
+        <span class="author"><a target="_blank" href="https://">Dongxing
+            Mao</a><sup>1</sup></sup></span>
+        <span class="author"><a target="_blank" href="https://sites.google.com/view/showlab">Mike
+            Zheng Shou</a><sup>1</sup></sup></span>
+    </p>
+    <table border="0" align="center" class="affiliations" width="1200px">
+        <tbody align="center">
+            <tr>
+                <td style="text-align: right; width: 33%;">&nbsp;<sup>&nbsp;</sup>&nbsp;<sup>1</sup>Show Lab, National University of Singapore</a></td>
+                <td style="text-align: center; width: 33%;">&nbsp;<sup>&nbsp;</sup>&nbsp;<sup>2</sup>Reality Labs Research, Meta</a></td>
+                <td style="text-align: left; width: 33%;">&nbsp;<sup>&nbsp;</sup>&nbsp;<sup>3</sup>University of Science and Technology of China</a></td>
+            </tr>
+        </tbody>
+    </table>
+    
+
+    <table width="0" border="0" align="center" class="menu" style="margin-bottom: 8px;">
+        <tbody>
+            <tr>
+                <td align="center">| <a href="#paper">Paper (Preview)</a> | <a href="">Code & Model (coming soon)</a> | <a href=""> HuggingFace Demo (coming soon) </a> | </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="container" style="width: 1200px;" >
+        <div style="text-align: center;">
+            <img src="./assets/teaser.png" alt="Teaser image" style="max-width: 100%; height: auto; display: block; margin: auto;" />
+        </div>
+    
+
+        <p><span class="section"><b>Abstract</b></span> </p>
+        
+        <p> Recent Large Language Models (LLMs) have been enhanced with vision capabilities, enabling them to understand images, videos, and interleaved vision-language content. However, the learning methods of these large multimodal models (LMMs) typically treat videos as predetermined clips, making them less effective and efficient at handling streaming video inputs. In this paper, we propose a novel Learning-In-Video-Stream (LIVE) framework, which enables temporally aligned, real-time, and free-form dialogue in a continuous video stream. Our LIVE framework includes comprehensive approaches to achieve video streaming dialogue, encompassing (1) a data generation scheme that converts offline temporal annotations to a streaming dialogue format, (2) a training objective designed to simulate the continuous streaming inputs, (3) an optimized inference pipeline for real-time interactive chat in real-world video stream. With our LIVE framework, we develop a simple VideoLLM-online model and demonstrate its significant advantages in processing streaming video. Meanwhile, VideoLLM-online also showcases state-of-the-art performance on public offline video benchmarks, such as recognition, captioning, forecasting. Code, model, demo will be released as soon as possible.
+        <p class="section">&nbsp;</p>
+        <p class="section"><b>Method</b></p>
+        <div style="text-align: center">
+            <img src="./assets/figure3.png" alt="" width="850" style="margin: auto" />
+        </div>
+        <p>Training method of our LIVE framework. We organize the user-AI dialogue data and video frames in temporal order as the input sequence for an architecture similar to LLaVA~\cite{llava}. To simulate dialogue in streaming video inputs, we employ not only the standard language modeling (LM) loss but also introduce a streaming prediction loss for frame tokens. This additional loss supervises the model when it is necessary to generate language, enabling it to produce temporally aligned responses. This also reduces the redundant dialogue history stored in the key-value cache, leading to more efficient chatting.</p>
+
+        <p class="section">&nbsp;</p>
+        <p class="section"><b>A Simple VideoLLM-online Demo (More is coming soon)</b></p>
+        <div style="text-align: center">
+        <video width="720" height="540" controls>
+            <source src="./assets/aria_cooking.mp4" type="video/mp4">
+        </video>
+            <!-- <iframe width="75%" height="500px" src="https://www.youtube.com/embed/eemzbXXU59E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
+        </div>
+
+        <p class="section" id="bibtex"><b>Bibtex</b></p>
+        <table border="0">
+            <tbody>
+                <pre style=" display: block;
+  background: #eee;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 100px;
+  border-radius: 20px;
+  ">
+
+    @InProceedings{videollm_online,
+      title={VideoLLM-online: Learning Large Language Model for Streaming Video},
+      author={Joya Chen, Zhaoyang Lv, Shiwei Wu, Kevin Qinghong Lin, Chenan Song, Difei Gao, Jiawei Liu, Ziteng Gao, Dongxing Mao and Mike Zheng Shou},
+      booktitle={CVPR},
+      year={2024}
+    }   
+			  </pre>
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+
+</body>
+
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-WLX2Z5QLG8');
+ </script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+ <script type="text/javascript">
+    $(document).ready(function () {
+
+        if (localStorage.getItem("my_app_name_here-quote-scroll") != null) {
+            $(window).scrollTop(localStorage.getItem("my_app_name_here-quote-scroll"));
+        }
+
+        $(window).on("scroll", function() {
+            localStorage.setItem("my_app_name_here-quote-scroll", $(window).scrollTop());
+        });
+
+      });
+ </script>
+
+ <script>
+    function prompt_on(prompt_element) {
+        prompt_element.classList.add("caption-active");
+    }
+
+    function prompt_off(prompt_element) {
+        prompt_element.classList.remove("caption-active");
+    }
+
+    function toggle_prompt(active_prompt_id, inactive_prompt_ids, result_id) {
+        let active_prompt = document.getElementById(active_prompt_id);
+        prompt_on(active_prompt);
+        for (let i = 0; i < inactive_prompt_ids.length; i++) {
+            let inactive_prompt = document.getElementById(inactive_prompt_ids[i]);
+            prompt_off(inactive_prompt);
+        }
+
+        let result = document.getElementById(result_id);
+        result.src = file_paths[active_prompt_id];
+    }
+ </script>
+
+ <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+ <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</html>
