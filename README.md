@@ -4,7 +4,7 @@
 <a href="https://huggingface.co/spaces/chenjoya/videollm-online" target="_blank"><img alt="Demo" src="https://img.shields.io/badge/🤗 Hugging Face Spaces-ffc107?color=ffc107" /></a>
 <a href="..." target="_blank"><img alt="Paper" src="https://img.shields.io/badge/📄 Paper-28a745?color=28a745" /></a>
 <a href="..." target="_blank"><img alt="Checkpoint" src="https://img.shields.io/badge/🤖 Checkpoint (Coming in 48h!)-2980b9?color=2980b9" /></a>
-<a href="https://huggingface.co/datasets/chenjoya/videollm-online-chat-ego4d-134k" target="_blank"><img alt="Data" src="https://img.shields.io/badge/🤗 Hugging Face Datasets-8e44ad?color=8e44ad" /></a>
+<a href="https://huggingface.co/datasets/chenjoya/videollm-online-chat-ego4d-134k" target="_blank"><img alt="Data" src="https://img.shields.io/badge/🤗 Hugging Face Datasets (videollm-online-chat-ego4d-134k)-8e44ad?color=8e44ad" /></a>
 
 ### TLDR
 
