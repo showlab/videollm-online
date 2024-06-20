@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
+  <!-- Replace the content tag with appropriate information -->
+  <meta name="description" content="DESCRIPTION META TAG">
+  <meta property="og:title" content="SOCIAL MEDIA TITLE TAG"/>
+  <meta property="og:description" content="SOCIAL MEDIA DESCRIPTION TAG TAG"/>
+  <meta property="og:url" content="URL OF THE WEBSITE"/>
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
+  <meta property="og:image" content="webpage/static/image/your_banner_image.png" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+
+  <meta name="twitter:title" content="TWITTER BANNER TITLE META TAG">
+  <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG">
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
+  <meta name="twitter:image" content="webpage/static/images/your_twitter_banner_image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Keywords for your paper to be indexed by-->
+  <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>VideoLLM-online</title>
+  <link rel="icon" type="image/x-icon" href="demo/assistant_avatar.png">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  rel="stylesheet">
+
+  <link rel="stylesheet" href="webpage/static/css/bulma.min.css">
+  <link rel="stylesheet" href="webpage/static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="webpage/static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="webpage/static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="webpage/static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="webpage/static/js/fontawesome.all.min.js"></script>
+  <script src="webpage/static/js/bulma-carousel.min.js"></script>
+  <script src="webpage/static/js/bulma-slider.min.js"></script>
+  <script src="webpage/static/js/index.js"></script>
+</head>
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-2 publication-title">VideoLLM-online: Online Large Language Model for Streaming Video</h1>
+            <div class="is-size-6 publication-authors">
+              <!-- Paper authors -->
+              <span class="author-block">
+                <a href="https://chenjoya.github.io/" target="_blank">Joya Chen</a>,
+            </span>
+            <span class="author-block">
+                <a href="https://lvzhaoyang.github.io/" target="_blank">Zhaoyang Lv</a>,
+            </span>
+            <span class="author-block">
+                <a href="..." target="_blank">Shiwei Wu</a>,
+            </span>
+            <span class="author-block">
+                <a href="https://qinghonglin.github.io/" target="_blank">Kevin Qinghong Lin</a>,
+            </span>
+            <span class="author-block">
+                <a href="..." target="_blank">Chenan Song</a>,
+            </span>
+            <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=No9OsocAAAAJ&hl=en" target="_blank">Difei Gao</a>,
+            </span>
+            <br> <!-- Line break here for the second line -->
+            <span class="author-block">
+                <a href="https://jia-wei-liu.github.io/" target="_blank">Jia-Wei Liu</a>,
+            </span>
+            <span class="author-block">
+                <a href="https://sebgao.github.io/" target="_blank">Ziteng Gao</a>,
+            </span>
+            <span class="author-block">
+                <a href="..." target="_blank">Dongxing Mao</a>,
+            </span>
+            <span class="author-block">
+                <a href="https://sites.google.com/view/showlab" target="_blank">Mike Zheng Shou</a>
+            </span>
+                  </div>
+
+                  <div class="is-size-5 publication-authors">
+                    <span class="author-block">
+                      <a href="https://sites.google.com/view/showlab" target="_blank">Show Lab, National University of Singapore</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                      <a href="https://about.meta.com/realitylabs/" target="_blank">Reality Labs Research, Meta</a><br>
+                      CVPR 2024
+                    </span>
+                    <!-- <span class="eql-cntrb"><small><br>Indicates Equal Contribution</small></span> -->
+                  </div>
+                  
+                  <!-- ArXiv abstract Link -->
+                    <span class="link-block">
+                      <a href="https://arxiv.org/abs/2406.11816" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                        <i class="ai ai-arxiv"></i>
+                      </span>
+                      <span>Paper</span>
+                    </a>
+                  </span>
+
+                  <!-- Github link -->
+                  <span class="link-block">
+                    <a href="https://github.com/showlab/VideoLLM-online" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+
+                <!-- HF Demo -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/spaces/chenjoya/VideoLLM-online" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="width: 1em; height: 1em;">
+                    </span>
+                    <span>HuggingFace Space Demo (Coming in 24h!)</span>
+                  </a>
+                </span>
+
+                <!-- HF Demo -->
+                <span class="link-block">
+                  <a href="..." target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="width: 1em; height: 1em;">
+                    </span>
+                    <span>HuggingFace Checkpoints (Coming in 48h!)</span>
+                  </a>
+                </span>
+
+                <!-- HF Demo -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/datasets/chenjoya/videollm-online-chat-ego4d-134k" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="width: 1em; height: 1em;">
+                    </span>
+                    <span>HuggingFace Datasets</span>
+                  </a>
+                </span>
+                
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Teaser video-->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <h2 class="subtitle">
+        TLDR: The first streaming video LLM, high speed (5~10 FPS on RTX 3090 GPU, 10~15 FPS on A100 GPU) on long-form videos (10 minutes), with SOTA performances on online/offline settings.
+      </h2>
+      <video poster="" id="tree" autoplay controls loop height="100%">
+        <!-- Your video here -->
+        <source src="webpage/static/videos/teaser.mp4" type="video/mp4" id="videoSource">
+      </video>
+      
+      <div class="button-container">
+        <button id="chineseButton" class="custom-button" onclick="switchToChinese()">See Demo Video with Chinese TTS (查看中文TTS演示视频)</button>
+        <button id="englishButton" class="custom-button" style="display: none;" onclick="switchToEnglish()">Return to Demo Video with English TTS</button>
+      </div>
+      
+      <ul>
+        <li><strong>Online Video Streaming</strong>: Unlike previous models that serve as offline mode (querying/responding to a full video), our model supports <strong>online interaction within a video stream</strong>. It can <strong>proactively</strong> update responses during a stream, such as recording activity changes or helping with the next steps in real time. Even GPT-4o, which is audio-driven, requires user voice interaction with the visual scene, not actual video streaming.</li>
+        <br>
+        <li><strong>Cheap and Scalable Streaming Data Synthesis</strong>: Current video datasets for training multimodal LLMs are mostly offline and unsuitable for training an online video language model. Our method <strong>transforms any offline annotation into streaming dialogue data</strong> by prompting open-source LLM. The model is entirely trained on Llama synthesized data.</li>
+        <br>
+        <li><strong>Real-Time Inference</strong>: Our inference method <strong>parallelizes</strong> video encoding, LLM forwarding for video frames, and LLM response generation, arranging them asynchronously. This significantly enhances real-time performance, achieving 5-10 FPS on RTX 3090 GPU, 10-15 FPS on an A100 GPU.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .button-container {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .custom-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .custom-button:hover {
+    background-color: #0056b3;
+    box-shadow: 0px 4px 15px rgba(0, 91, 187, 0.2);
+  }
+
+  .custom-button:active {
+    background-color: #004494;
+  }
+</style>
+
+<script>
+  function switchToChinese() {
+    document.getElementById('videoSource').src = 'webpage/static/videos/teaser_cn.mp4';
+    document.getElementById('tree').load();
+    document.getElementById('chineseButton').style.display = 'none';
+    document.getElementById('englishButton').style.display = 'inline-block';
+  }
+
+  function switchToEnglish() {
+    document.getElementById('videoSource').src = 'webpage/static/videos/teaser.mp4';
+    document.getElementById('tree').load();
+    document.getElementById('englishButton').style.display = 'none';
+    document.getElementById('chineseButton').style.display = 'inline-block';
+  }
+</script>
+
+
+<!-- End teaser video -->
+
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Recent Large Language Models have been enhanced with vision capabilities, enabling them to comprehend images, videos, and interleaved vision-language content. However, the learning methods of these large multimodal models typically treat videos as predetermined clips, making them less effective and efficient at handling streaming video inputs. In this paper, we propose a novel Learning-In-Video-Stream (LIVE) framework, which enables temporally aligned, long-context, and real-time conversation within a continuous video stream. Our LIVE framework comprises comprehensive approaches to achieve video streaming dialogue, encompassing: (1) a training objective designed to perform language modeling for continuous streaming inputs, (2) a data generation scheme that converts offline temporal annotations into a streaming dialogue format, and (3) an optimized inference pipeline to speed up the model responses in real-world video streams. With our LIVE framework, we built VideoLLM-online model upon Llama-2/Llama-3 and demonstrate its significant advantages in processing streaming videos. For instance, on average, our model can support streaming dialogue in a 5-minute video clip at over 10 FPS on an A100 GPU. Moreover, it also showcases state-of-the-art performance on public offline video benchmarks, such as recognition, captioning, and forecasting. The code, model, data, and demo have been made available at https://showlab.github.io/videollm-online.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="item" style="width: 1000px;">
+          <h2 class="title is-3" style="text-align: center;">Model Method</h2>
+          <img src="webpage/static/images/model.png" alt="MY ALT TEXT" width="900" />
+          <h2 class="subtitle" style="text-align: left;">
+            Our training framework. We organize the user-assistant dialogue data and video frames in temporal order as the input sequence. To learn the model when to answer or keep silent in a video stream, we employ not only the standard language modeling (LM) loss but also introduce a streaming EOS prediction loss. This additional loss supervises the model when it is necessary to generate language, enabling it to produce temporally aligned responses and reduces the redundant dialogue history.
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="item" style="width: 1000px;">
+          <h2 class="title is-3" style="text-align: center;">Data Method</h2>
+          <img src="webpage/static/images/data.png" alt="MY ALT TEXT" width="500" />
+          <h2 class="subtitle" style="text-align: left;">
+            Our streaming dialogue data generation method. We randomly insert various templated questions into the video timeline and ``expose'' the ground-truth video annotations (along with their timestamps) to LLMs, prompting them to answer the queries  within a period of time.
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@inproceedings{VideoLLM-online,
+        author       = {Joya Chen and Zhaoyang Lv and Shiwei Wu and Kevin Qinghong Lin and Chenan Song and Difei Gao and Jia-Wei Liu and Ziteng Gao and Dongxing Mao and Mike Zheng Shou},
+        title        = {VideoLLM-online: Online Video Large Language Model for Streaming Video},
+        booktitle    = {CVPR},
+        year         = {2024},
+      }</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+  <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Statcounter tracking code -->
+  
+<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+
+    <!-- End of Statcounter Code -->
+
+  </body>
+  </html>
