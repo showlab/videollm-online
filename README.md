@@ -1,9 +1,9 @@
 ## <img src="demo/assistant_rectangle.png" height="25"> VideoLLM-online: Online Video Large Language Model for Streaming Video
 
 <a href="https://showlab.github.io/videollm-online/" target="_blank"><img alt="Homepage" src="https://img.shields.io/badge/🌍 Homepage-d35400?color=d35400" /></a>
-<a href="..." target="_blank"><img alt="Demo" src="https://img.shields.io/badge/🤗 Hugging Face Spaces (Coming in 24h!)-ffc107?color=ffc107" /></a>
-<a href="..." target="_blank"><img alt="Paper" src="https://img.shields.io/badge/📄 Paper-28a745?color=28a745" /></a>
-<a href="..." target="_blank"><img alt="Checkpoint" src="https://img.shields.io/badge/🤖 Checkpoint (Coming in 48h!)-2980b9?color=2980b9" /></a>
+<a href="https://huggingface.co/spaces/chenjoya/videollm-online" target="_blank"><img alt="Demo" src="https://img.shields.io/badge/🤗 Hugging Face Spaces-ffc107?color=ffc107" /></a>
+<a href="https://arxiv.org/abs/2406.11816" target="_blank"><img alt="Paper" src="https://img.shields.io/badge/📄 Paper-28a745?color=28a745" /></a>
+<a href="https://huggingface.co/chenjoya/videollm-online-8b-v1plus" target="_blank"><img alt="Checkpoint" src="https://img.shields.io/badge/🤗 Hugging Face Models-2980b9?color=2980b9" /></a>
 <a href="https://huggingface.co/datasets/chenjoya/videollm-online-chat-ego4d-134k" target="_blank"><img alt="Data" src="https://img.shields.io/badge/🤗 Hugging Face Datasets-8e44ad?color=8e44ad" /></a>
 
 ### TLDR
@@ -27,10 +27,8 @@ This is the official implementation of [VideoLLM-online: Online Video Large Lang
 - Try demo at <a href="..." target="_blank"> <img alt="Demo" src="https://img.shields.io/badge/🤗 Hugging Face Spaces-ffc107?color=ffc107" /> </a>
 - Or launch the demo locally with:
 ```sh
-python -m demo.app --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus
+python -m demo.app
 ```
-
-This will automatically download checkpoints.
 
 ### Installation
 
@@ -67,7 +65,7 @@ A more detailed instruction will be available soon.
 
 ### Model Zoo
 
-#### [VideoLLM-online-8B-v1+](https://huggingface.co/chenjoya/videollm-online-8b-v1plus)
+#### [Live1+3x3-Llama3-8B](...)
 * LLM: meta-llama/Meta-Llama-3-8B-Instruct
 * Vision Strategy:
     * Frame Encoder: google/siglip-large-patch16-384
@@ -77,7 +75,7 @@ A more detailed instruction will be available soon.
     * Video Length: 10 minutes
 * Training Data: Ego4D Narration Stream 113K + Ego4D GoalStep Stream 21K 
 
-#### [VideoLLM-online-8B-v1](...) 
+#### [Live1-Llama3-8B](...) 
 * LLM: meta-llama/Meta-Llama-3-8B-Instruct
 * Vision Strategy:
     * Frame Encoder: google/siglip-large-patch16-384
