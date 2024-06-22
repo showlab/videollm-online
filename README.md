@@ -30,7 +30,7 @@ This is the official implementation of [VideoLLM-online: Online Video Large Lang
 python -m demo.app --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus
 ```
 
-By passing ```--resume_from_checkpoint chenjoya/videollm-online-8b-v1plus```, the PEFT checkpoint will be automatically downloaded.
+By passing ```--resume_from_checkpoint chenjoya/videollm-online-8b-v1plus```, the PEFT checkpoint will be automatically downloaded and applied to ```meta-llama/Meta-Llama-3-8B-Instruct```.
 
 ### Installation
 
@@ -67,7 +67,7 @@ A more detailed instruction will be available soon.
 
 ### Model Zoo
 
-#### [Live1+3x3-Llama3-8B](...)
+#### [VideoLLM-online-8B-v1+](https://huggingface.co/chenjoya/videollm-online-8b-v1plus)
 * LLM: meta-llama/Meta-Llama-3-8B-Instruct
 * Vision Strategy:
     * Frame Encoder: google/siglip-large-patch16-384
@@ -77,7 +77,7 @@ A more detailed instruction will be available soon.
     * Video Length: 10 minutes
 * Training Data: Ego4D Narration Stream 113K + Ego4D GoalStep Stream 21K 
 
-#### [Live1-Llama3-8B](...) 
+#### [VideoLLM-online-8B-v1](...) 
 * LLM: meta-llama/Meta-Llama-3-8B-Instruct
 * Vision Strategy:
     * Frame Encoder: google/siglip-large-patch16-384
