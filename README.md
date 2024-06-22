@@ -92,7 +92,7 @@ This codebase has a very simple and clean implementation. You only need to chang
 ### Citation
 
 ```
-@inproceedings{live,
+@inproceedings{videollm-online,
   author       = {Joya Chen and Zhaoyang Lv and Shiwei Wu and Kevin Qinghong Lin and Chenan Song and Difei Gao and Jia-Wei Liu and Ziteng Gao and Dongxing Mao and Mike Zheng Shou},
   title        = {VideoLLM-online: Online Video Large Language Model for Streaming Video},
   booktitle    = {CVPR},
