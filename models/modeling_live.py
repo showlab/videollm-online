@@ -212,7 +212,7 @@ def build_live(
         model = get_peft_model(model, lora_config)
         model.print_trainable_parameters()
     else:
-        if resume_from_checkpoint and os.path.exists(resume_from_checkpoint):
+        if resume_from_checkpoint:
             model = PeftModel.from_pretrained(model, resume_from_checkpoint, is_trainable=False)
         else:
             logger.warning(f'!!! Fail to load checkpoint: {resume_from_checkpoint}. Return a new initialized model.')

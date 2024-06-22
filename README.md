@@ -14,7 +14,7 @@ The first streaming video LLM, high speed (5 ~ 10 FPS on NVIDIA 3090 GPU, 10 ~ 1
 
 ### Introduction
 
-This is the official implementation of [VideoLLM-online: Online Video Large Language Model for Streaming Video](...), CVPR 2024. Our paper introduces several interesting stuffs compared to popular image/video/multimodal models:
+This is the official implementation of [VideoLLM-online: Online Video Large Language Model for Streaming Video](https://arxiv.org/abs/2406.11816), CVPR 2024. Our paper introduces several interesting stuffs compared to popular image/video/multimodal models:
 
 - **Online Video Streaming**: Unlike previous models that serve as offline mode (querying/responding to a full video), our model supports **online interaction within a video stream**. It can **proactively** update responses during a stream, such as recording activity changes or helping with the next steps in real time. Even GPT-4o, which is audio-driven, requires user voice interaction with the visual scene, not actual video streaming.
 
