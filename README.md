@@ -27,8 +27,10 @@ This is the official implementation of [VideoLLM-online: Online Video Large Lang
 - Try demo at <a href="..." target="_blank"> <img alt="Demo" src="https://img.shields.io/badge/🤗 Hugging Face Spaces-ffc107?color=ffc107" /> </a>
 - Or launch the demo locally with:
 ```sh
-python -m demo.app
+python -m demo.app --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus
 ```
+
+By passing ```--resume_from_checkpoint chenjoya/videollm-online-8b-v1plus```, the PEFT checkpoint will be automatically downloaded.
 
 ### Installation
 
