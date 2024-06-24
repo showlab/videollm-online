@@ -43,7 +43,7 @@ By passing ```--resume_from_checkpoint chenjoya/videollm-online-8b-v1plus```, th
 Ensure you have Miniconda and Python version >= 3.10 installed, then run:
 ```sh
 conda install -y pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-pip install transformers accelerate deepspeed peft editdistance Levenshtein tensorboard gradio moviepy submitit
+pip install transformers accelerate deepspeed peft editdistance Levenshtein tensorboard gradio moviepy submitit submitit
 pip install flash-attn --no-build-isolation
 ```
 
