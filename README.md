@@ -24,11 +24,17 @@ This is the official implementation of [VideoLLM-online: Online Video Large Lang
 
 ### Quick Start
 
-- Try demo at <a href="..." target="_blank"> <img alt="Demo" src="https://img.shields.io/badge/🤗 Hugging Face Spaces-ffc107?color=ffc107" /> </a>
-- Or launch the demo locally with:
+- (Recommended) Launch the gradio demo locally with:
 ```sh
 python -m demo.app --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus
 ```
+
+- (Recommended) Launch the CLI locally with:
+```sh
+python -m demo.cli --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus
+```
+
+- (Deprecated, HF Spaces too slow) Try demo at <a href="..." target="_blank"> <img alt="Demo" src="https://img.shields.io/badge/🤗 Hugging Face Spaces-ffc107?color=ffc107" /> </a>
 
 By passing ```--resume_from_checkpoint chenjoya/videollm-online-8b-v1plus```, the PEFT checkpoint will be automatically downloaded and applied to ```meta-llama/Meta-Llama-3-8B-Instruct```.
 
