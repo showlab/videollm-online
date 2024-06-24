@@ -6,7 +6,7 @@ deepspeed train.py --deepspeed configs/deepspeed/zero2.json \
     --per_device_eval_batch_size 1 \
     --gradient_accumulation_steps 8 \
     --gradient_checkpointing True \
-    --evaluation_strategy no \
+    --eval_strategy no \
     --prediction_loss_only False \
     --save_strategy no \
     --learning_rate 0.0002 \

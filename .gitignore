@@ -10,4 +10,3 @@ __pycache__/
 *.wav
 /demo/rendering/*.mp4
 .DS_Store
-/data/preprocess

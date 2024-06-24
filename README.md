@@ -37,7 +37,7 @@ By passing ```--resume_from_checkpoint chenjoya/videollm-online-8b-v1plus```, th
 Ensure you have Miniconda and Python version >= 3.10 installed, then run:
 ```sh
 conda install -y pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-pip install transformers accelerate deepspeed peft editdistance Levenshtein tensorboard gradio moviepy
+pip install transformers accelerate deepspeed peft editdistance Levenshtein tensorboard gradio moviepy submitit
 pip install flash-attn --no-build-isolation
 ```
 
@@ -61,9 +61,9 @@ mv ChatTTS demo/rendering/
 
 - Download streaming dialogue data and Ego4D video features (google/siglip-large-patch16-384) from <a href="https://drive.google.com/drive/folders/1EfWu0lTpQH_p-HnwpBiZFwCE-OsUNagl?usp=sharing" target="_blank"><img alt="Data" src="https://img.shields.io/badge/📁 Data-8e44ad?color=8e44ad" /></a>
 
-- Refer to the examples under [scripts/](scripts/)
+- Distributed preprocess video frames: 2 FPS and 384 resolution, then using ```google/siglip-large-patch16-384``` to extract CLS with avg pooled  3x3 spatial tokens. Please refer to [preprocess/](preprocess/)
 
-A more detailed instruction will be available soon.
+- Refer to the examples under [scripts/](scripts/)
 
 ### Model Zoo
 

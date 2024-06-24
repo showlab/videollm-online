@@ -1,12 +1,13 @@
 deepspeed --deepspeed configs/deepspeed/zero2.json \
-    --live_version live1 \
-    --train_datasets ego4d_goalstep_livechat_trainval ego4d_refined_narration_stream_train ego4d_refined_narration_stream_val \
-    --num_train_epochs 2 \
+    --live_version live1+ \
+    --train_datasets coin_step_train coin_next_train coin_task_train coin_procedure_train coin_taskprocedure_train \
+    --eval_datasets coin_step_test coin_next_test coin_task_test coin_procedure_test coin_taskprocedure_test \
+    --num_train_epochs 5 \
     --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 1 \
     --gradient_accumulation_steps 8 \
     --gradient_checkpointing True \
-    --evaluation_strategy no \
+    --eval_strategy no \
     --prediction_loss_only False \
     --save_strategy no \
     --learning_rate 0.0002 \
@@ -19,4 +20,4 @@ deepspeed --deepspeed configs/deepspeed/zero2.json \
     --tf32 True \
     --report_to tensorboard \
     --augmentation True \
-    --output_dir outputs/ego4d_live1_aug \
+    --output_dir outputs/coin_live1+_aug \
