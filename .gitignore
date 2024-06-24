@@ -6,7 +6,6 @@ __pycache__/
 /demo/assets/*.json
 /demo/assets/cache
 /demo/rendering/ChatTTS
-*.json
 *.wav
 /demo/rendering/*.mp4
 .DS_Store
