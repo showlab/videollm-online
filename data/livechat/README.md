@@ -19,7 +19,7 @@ datasets/ego4d/v2/annotations/
 ### Run Streaming Data Generation Script
 
 ```
-python -m data.ego4d.livechat.ego4d_goalstep_livechat_generation --num_gpus 8 --anno_root 
+python -m data.livechat.ego4d_goalstep_livechat_generation --num_gpus 1 --num_queries_each_conversation 3 --num_conversations_each_video 10
 ```
 
 - Please run the script in ```videollm-online/``` root folder.

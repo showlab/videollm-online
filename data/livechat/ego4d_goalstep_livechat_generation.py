@@ -11,6 +11,9 @@ from ..ego4d import Ego4D
 class LiveOnePlusLiveChatGenerationArguments(LiveOnePlusTrainingArguments):
     num_nodes: int = 1
     num_gpus: int = 8
+    num_queries_each_conversation: int = 3
+    num_conversations_each_video: int = 10
+    slurm_partition: str = None
 
 class Ego4DLiveChatGeneration(Ego4D):
     @staticmethod
@@ -33,10 +36,10 @@ class Ego4DLiveChatGeneration(Ego4D):
                     })
         return annos
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.num_queries = 3
-        self.num_times = 10
+    def __init__(self, num_queries_each_conversation: int, num_conversations_each_video: int, **kwargs):
+        super().__init__(vision_pretrained=kwargs['vision_pretrained'], embed_mark=kwargs['embed_mark'], frame_fps=kwargs['frame_fps'])
+        self.num_queries_each_conversation = num_queries_each_conversation
+        self.num_conversations_each_video = num_conversations_each_video
         annos = Ego4DLiveChatGeneration.get_narrations('train') + Ego4DLiveChatGeneration.get_narrations('val')
         self.annos = []
         for anno in annos:
@@ -64,10 +67,10 @@ class Ego4DLiveChatGeneration(Ego4D):
     def __call__(self, index):
         anno = self.annos[index]
         video_uid, timestamps, prompt = anno['video_uid'], anno['timestamps'], anno['prompt']
-        for nt in range(self.num_times):
+        for nt in range(self.num_conversations_each_video):
             user_times = (torch.rand(3) * (timestamps[-1] - timestamps[0]) + timestamps[0]).sort().values.tolist()
             user_times = [round(ut, 1) for ut in user_times]
-            user_queries = random.sample(Templates.queries, self.num_queries)
+            user_queries = random.sample(Templates.queries, self.num_queries_each_conversation)
             example = ''
             for ui in range(len(user_queries)):
                 example += f"\n{user_times[ui]}s User: {user_queries[ui]}\n{user_times[ui]}s Assistant: ..."
@@ -105,7 +108,7 @@ class Ego4DLiveChatGeneration(Ego4D):
             text = f"{prefix}{narration[0]:.2f}s-{narration[1]:.2f}s: {narration[2]}"
         return text
 
-def distributed_livechat_generation(args: LiveOnePlusLiveChatGenerationArguments):
+def distributed_livechat_generation(args):
     env = submitit.JobEnvironment()
     torch.cuda.set_device(env.local_rank)
     generator = Ego4DLiveChatGeneration(**asdict(args))

@@ -23,7 +23,7 @@ def distributed_refine_narration(args: LiveOnePlusEncodingArguments):
     model.eval()
     model.to('cuda')
     generator = functools.partial(model.generate, max_new_tokens=64, do_sample=False, top_p=1.0, temperature=1.0, use_cache=True, pad_token_id=tokenizer.pad_token_id)
-
+    
     anno_path = os.path.join(args.ego4d_anno_root, f'narration_stream_{args.split}.json')
     save_dir = os.path.join(args.ego4d_anno_root, f'refined_narration_stream_{args.split}')
     annos = json.load(open(anno_path))
