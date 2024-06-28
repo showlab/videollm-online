@@ -71,7 +71,7 @@ mv ChatTTS demo/rendering/
 
 - Refer to the examples under [scripts/](scripts/)
 
-- If you are interested in our streaming dialogue data generation, please see [data/livechat/](https://github.com/showlab/videollm-online/tree/main/data/livechat).
+- If you are interested in our streaming dialogue data generation, please see [data/livechat/](https://github.com/showlab/videollm-online/tree/main/data/livechat)
 
 ### Model Zoo
 
