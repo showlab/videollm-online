@@ -1,12 +1,12 @@
 ## Distributed Streaming Dialogue Data Generation
 
-This part describes how to generate streaming dialogue data on Ego4D GoalStep dataset.
+This section describes how to generate streaming dialogue data on the Ego4D GoalStep dataset.
 
 ### Download Ego4D GoalStep Annotation JSON
 
 Try to download Ego4D annotations. Refer to [Ego4D](https://ego4d-data.org/docs/start-here/) for details.
 
-After that, you can use symbolic link to ensure you have ego4d annotations as the following:
+After that, you can use a symbolic link to ensure you have the Ego4D annotations as shown below:
 
 ```
 datasets/ego4d/v2/annotations/
@@ -30,6 +30,6 @@ python -m data.ego4d.livechat.ego4d_goalstep_livechat_generation --num_gpus 8 --
 
 ### Filtering out Data expose ground-truth
 
-We find sometimes the generated dialogue will expose the timestamp information in ground-truth annotation. The pattern is "second", "..s" appeared in generated assistant responses. Furthermore, we remove dialogue less than 1 minute and larger than 60 minutes.
+We find that the generated dialogue may expose the timestamp information in the ground-truth annotations. The pattern is "second", "..s" appearing in the generated assistant responses. So we remove them. Furthermore, we remove dialogues less than 1 minute and longer than 60 minutes.
 
 See python [filter.py](filter.py) for details.

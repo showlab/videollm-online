@@ -71,6 +71,8 @@ mv ChatTTS demo/rendering/
 
 - Refer to the examples under [scripts/](scripts/)
 
+- If you are interested in our streaming dialogue data generation, please see [data/livechat/](https://github.com/showlab/videollm-online/tree/main/data/livechat)
+
 ### Model Zoo
 
 #### [VideoLLM-online-8B-v1+](https://huggingface.co/chenjoya/videollm-online-8b-v1plus)
