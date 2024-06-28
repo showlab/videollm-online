@@ -27,7 +27,7 @@ class COINBenchmark(COIN, StreamMixIn):
         return *super().__getitem__(conversation=anno['conversation'], load_ranges=anno['load_ranges']), index, self.evaluation_kwargs
 
 class COINStep(COINBenchmark):
-    get_user_message = {
+    user_message = {
         "role": "user",
         "content": 'What is the action in the video? Format your answer concisely. No extra text output.'
     }
@@ -39,7 +39,6 @@ class COINStep(COINBenchmark):
         self.answers, self.mapping_categories = [], self.steps_categories
         for anno in self._annos:
             video_uid = anno['video_uid']
-            # TODO: replace it when right video ready
             duration = self.metadata[video_uid]['duration']
             steps = anno['steps']
             for i in range(len(steps)):
@@ -49,18 +48,15 @@ class COINStep(COINBenchmark):
                 start_frame = int(start_time * frame_fps)
                 end_frame = int(end_time * frame_fps) + 1
                 conversation = [
-                    COINStep.get_user_message,
-                    {"role": "stream", 'num_frames': end_frame - start_frame}
+                    COINStep.user_message,
+                    {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True},
+                    {"role": "assistant", "content": response, 'learn': True}
                 ]
-                conversation[-1]['learn'] = True
-                conversation.append({"role": "assistant", "content": response, 'learn': True})
                 self.annos.append({
                     'conversation': conversation,
                     'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
                 })
                 self.answers.append(self.mapping_categories.index(response))
-
-        # self.annos = self.annos[:10] # for debug
 
 def build_coin_step_train(**kwargs):
     return COINStep(split='train', **kwargs)
@@ -69,7 +65,7 @@ def build_coin_step_test(**kwargs):
     return COINStep(split='test', **kwargs)
 
 class COINNext(COINBenchmark):
-    get_user_message = {
+    user_message = {
         "role": "user",
         "content": 'What is the next action for the video? Format your answer concisely. No extra text output.'
     }
@@ -90,18 +86,15 @@ class COINNext(COINBenchmark):
                 start_frame = int(start_time * frame_fps)
                 end_frame = int(end_time * frame_fps) + 1
                 conversation = [
-                    COINNext.get_user_message,
-                    {"role": "stream", 'num_frames': end_frame - start_frame}
+                    COINNext.user_message,
+                    {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True},
+                    {"role": "assistant", "content": response, 'learn': True}
                 ]
-                conversation[-1]['learn'] = True
-                conversation.append({"role": "assistant", "content": response, 'learn': True})
                 self.annos.append({
                     'conversation': conversation,
                     'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
                 })
                 self.answers.append(self.mapping_categories.index(response))
-
-        # self.annos = self.annos[:10] # for debug
 
 def build_coin_next_train(**kwargs):
     return COINNext(split='train', **kwargs)
@@ -110,7 +103,7 @@ def build_coin_next_test(**kwargs):
     return COINNext(split='test', **kwargs)
 
 class COINTask(COINBenchmark):
-    get_user_message = {
+    user_message = {
         "role": "user",
         "content": 'What is the overall activity in the video? Format your answer concisely. No extra text output.'
     }
@@ -129,18 +122,15 @@ class COINTask(COINBenchmark):
             start_frame = int(start_time * frame_fps)
             end_frame = int(end_time * frame_fps) + 1
             conversation = [
-                COINTask.get_user_message,
-                {"role": "stream", 'num_frames': end_frame - start_frame}
+                COINTask.user_message,
+                {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True},
+                {"role": "assistant", "content": response, 'learn': True}
             ]
-            conversation[-1]['learn'] = True
-            conversation.append({"role": "assistant", "content": response, 'learn': True})
             self.annos.append({
                 'conversation': conversation,
                 'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
             })
             self.answers.append(self.mapping_categories.index(response))
-
-        # self.annos = self.annos[:10] # for debug
 
 def build_coin_task_train(**kwargs):
     return COINTask(split='train', **kwargs)
@@ -150,7 +140,7 @@ def build_coin_task_test(**kwargs):
 
 class COINProcedure(COINBenchmark):
     max_num_steps = 5
-    get_user_message = lambda num_steps: {
+    user_message = lambda num_steps: {
         "role": "user",
         "content": f'What is the next {num_steps} actions for the video? Format your answer concisely, listing each action on a new line with a number prefix. No extra text output.'
     }
@@ -173,25 +163,22 @@ class COINProcedure(COINBenchmark):
                 num_next_steps = len(next_steps)
                 if num_next_steps == 1:
                     conversation = [
-                        COINNext.get_user_message,
-                        {"role": "stream", 'num_frames': end_frame - start_frame}
+                        COINNext.user_message,
+                        {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = next_steps[0]['text'].capitalize() + '.'
                 else:
                     conversation = [
-                        COINProcedure.get_user_message(num_next_steps),
-                        {"role": "stream", 'num_frames': end_frame - start_frame}
+                        COINProcedure.user_message(num_next_steps),
+                        {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = '\n'.join(f"{i+1}. {s['text'].capitalize()}." for i, s in enumerate(next_steps))
-                conversation[-1]['learn'] = True
                 conversation.append({"role": "assistant", "content": response, 'learn': True})
                 self.annos.append({
                     'conversation': conversation,
                     'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
                 })
                 self.answers.append([self.mapping_categories.index(step['text'].capitalize() + '.') for step in next_steps])
-
-        # self.annos = self.annos[:10] # for debug
 
     def compute_metrics(self, eval_predictions: EvalPrediction, tokenizer: PreTrainedTokenizer, **kwargs):
         batch_pred_tensor, sample_idxs = eval_predictions.predictions, eval_predictions.label_ids
@@ -241,16 +228,15 @@ class COINTaskProcedure(COINBenchmark):
                 if num_next_steps == 1:
                     conversation = [
                         COINTaskProcedure.get_query_single(anno['task']),
-                        {"role": "stream", 'num_frames': end_frame - start_frame}
+                        {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = next_steps[0]['text'].capitalize() + '.'
                 else:
                     conversation = [
                         COINTaskProcedure.get_query_multi(anno['task'], num_next_steps),
-                        {"role": "stream", 'num_frames': end_frame - start_frame}
+                        {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = '\n'.join(f"{i+1}. {s['text'].capitalize()}." for i, s in enumerate(next_steps))
-                conversation[-1]['learn'] = True
                 conversation.append({"role": "assistant", "content": response, 'learn': True})
                 self.annos.append({
                     'conversation': conversation,
