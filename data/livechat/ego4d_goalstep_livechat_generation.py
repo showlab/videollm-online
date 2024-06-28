@@ -1,9 +1,16 @@
-import torch, tqdm, json, os, random
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from .ego4d import Ego4D
+import json, torch, tqdm, os, submitit, random
+from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser
+from dataclasses import dataclass, asdict
 
-from ..utils import ceil_time_by_fps
+from models.arguments_live import LiveOnePlusTrainingArguments
 from .templates import Templates
+from ..utils import ceil_time_by_fps
+from ..ego4d import Ego4D
+
+@dataclass
+class LiveOnePlusLiveChatGenerationArguments(LiveOnePlusTrainingArguments):
+    num_nodes: int = 1
+    num_gpus: int = 8
 
 class Ego4DLiveChatGeneration(Ego4D):
     @staticmethod
@@ -26,11 +33,10 @@ class Ego4DLiveChatGeneration(Ego4D):
                     })
         return annos
     
-    def __init__(self, fps: int, **kwargs):
-        super().__init__(fps=fps, **kwargs)
-        self.fps = fps
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.num_queries = 3
-        self.num_times = 2
+        self.num_times = 10
         annos = Ego4DLiveChatGeneration.get_narrations('train') + Ego4DLiveChatGeneration.get_narrations('val')
         self.annos = []
         for anno in annos:
@@ -42,7 +48,7 @@ class Ego4DLiveChatGeneration(Ego4D):
                     timestamps.append(narration[1])
                 prompt += self.to_text('', narration) + '\n'
             prompt += f"\nNow, please complete the conversation between user and assistant. Note that the assistant will actively provides clear, concise, real-time language assistance. The assistant does not know the absolute time. Sometimes the user may ask irrelevant questions, the assistant is very helpful and will also answer that."
-            timestamps = [ceil_time_by_fps(t, fps, 0, self.metadata[anno['video_uid']]['duration']) for t in timestamps]
+            timestamps = [ceil_time_by_fps(t, self.frame_fps, 0, self.metadata[anno['video_uid']]['duration']) for t in timestamps]
             timestamps = sorted(list(set(timestamps)))
             self.annos.append({
                 'video_uid': anno['video_uid'],
@@ -85,11 +91,11 @@ class Ego4DLiveChatGeneration(Ego4D):
                     time = float(line[:role_index].rstrip(' s'))
                     content = line[role_index+len(role)+2:]
                     anno['conversation'].append({'role': role.lower(), 'content': content, 'time': time})
-                os.makedirs('datasets/ego4d/v2/annotations/livechat/', exist_ok=True)
-                json.dump(anno, open(f'datasets/ego4d/v2/annotations/livechat/{video_uid}_{index}_{nt}.json', 'w'), indent=4)
+                os.makedirs(f'{Ego4D.anno_root}/livechat/', exist_ok=True)
+                json.dump(anno, open(f'{Ego4D.anno_root}/livechat/{video_uid}_{index}_{nt}.json', 'w'), indent=4)
             except:
                 print('\n---\n' + text + '\n---\n')
-        
+    
     @staticmethod
     def to_text(prefix: str, narration: list):
         assert len(narration) >= 2 and len(narration) <= 3
@@ -99,16 +105,25 @@ class Ego4DLiveChatGeneration(Ego4D):
             text = f"{prefix}{narration[0]:.2f}s-{narration[1]:.2f}s: {narration[2]}"
         return text
 
-def distributed_livechat_generation():
-    class ModelConfig:
-        vision_pretrained: str = 'google/siglip-large-patch16-384'
-        frame_strategy: str = '2fps_max384_pad#000000_1+4x4'
+def distributed_livechat_generation(args: LiveOnePlusLiveChatGenerationArguments):
+    env = submitit.JobEnvironment()
     torch.cuda.set_device(env.local_rank)
-    generator = Ego4DLiveChatGeneration(model_config=ModelConfig, fps=2)
+    generator = Ego4DLiveChatGeneration(**asdict(args))
     for i in tqdm.tqdm(range(len(generator))):
         if i % env.num_tasks != env.global_rank:
             continue
         generator(i)
     
 if __name__ == "__main__":
-    distributed_livechat_generation()
+    args, = HfArgumentParser(LiveOnePlusLiveChatGenerationArguments).parse_args_into_dataclasses()
+    executor = submitit.AutoExecutor(folder=f"outputs/preprocess/")
+    executor.update_parameters(
+        tasks_per_node=args.num_gpus,
+        nodes=args.num_nodes,
+        gpus_per_node=args.num_gpus,
+        cpus_per_task=10,
+        slurm_partition=args.slurm_partition,
+        mem_gb=240,
+        slurm_time='24:00:00',
+    )
+    job = executor.submit(distributed_livechat_generation, args)

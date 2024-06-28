@@ -8,6 +8,7 @@ from models.arguments_live import LiveOnePlusTrainingArguments
 class LiveOnePlusEncodingArguments(LiveOnePlusTrainingArguments):
     num_nodes: int = 1
     num_gpus: int = 8
+    slurm_partition: str = None
     anno_root: str = 'datasets/ego4d/v2/annotations'
     split: str = 'train'
 
@@ -65,6 +66,7 @@ if __name__ == "__main__":
         tasks_per_node=args.num_gpus,
         nodes=args.num_nodes,
         gpus_per_node=args.num_gpus,
+        slurm_partition=args.slurm_partition,
         cpus_per_task=10,
         mem_gb=240,
         slurm_time='24:00:00',
