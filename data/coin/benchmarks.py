@@ -7,7 +7,7 @@ from ..stream import StreamMixIn
 from ..utils import ceil_time_by_fps, DictWithTo
 
 class COINBenchmark(COIN, StreamMixIn):
-    evaluation_kwargs = DictWithTo(evaluator='generate', max_new_tokens=512, do_sample=False, use_cache=True, temperature=1.0, top_p=1.0)
+    evaluation_kwargs = DictWithTo(evaluator='generate_after_embed', max_new_tokens=512, do_sample=False, use_cache=True, temperature=1.0, top_p=1.0)
 
     @staticmethod
     def fuzzy_match(text, choices):
@@ -24,7 +24,8 @@ class COINBenchmark(COIN, StreamMixIn):
 
     def __getitem__(self, index):
         anno = self.annos[index]
-        return *super().__getitem__(conversation=anno['conversation'], load_ranges=anno['load_ranges']), index, self.evaluation_kwargs
+        conversation = anno['conversation'] if self.is_training else anno['conversation'][:-1] # if not training, do not include the assistant message
+        return *super().__getitem__(conversation=conversation, load_ranges=anno['load_ranges'], add_generation_prompt=not self.is_training), index, self.evaluation_kwargs
 
 class COINStep(COINBenchmark):
     user_message = {
