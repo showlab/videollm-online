@@ -46,7 +46,7 @@ class LiveMixin(AutoModelForCausalLM):
         self,
         input_ids: torch.LongTensor,
         labels: torch.LongTensor,
-        frames: torch.ByteTensor,
+        frames: torch.Tensor,
         ignore_token_id: int = -100,
         frame_token_interval_threshold: float = 0.0,
         **kwargs
