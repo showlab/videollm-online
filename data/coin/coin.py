@@ -2,7 +2,7 @@ import os, json, tqdm, torch
 
 class COIN:
     root = 'datasets/coin'
-    video_root = os.path.join(root, 'full_scale')
+    video_root = os.path.join(root, 'videos')
     anno_root = os.path.join(root, 'annotations')
     def __init__(self, split: str, vision_pretrained: str, embed_mark: str, frame_fps: int, **kwargs):
         super().__init__(**kwargs)
