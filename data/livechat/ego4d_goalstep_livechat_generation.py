@@ -119,7 +119,7 @@ def distributed_livechat_generation(args):
     
 if __name__ == "__main__":
     args, = HfArgumentParser(LiveOnePlusLiveChatGenerationArguments).parse_args_into_dataclasses()
-    executor = submitit.AutoExecutor(folder=f"outputs/preprocess/")
+    executor = submitit.AutoExecutor(folder=f"outputs/preprocess/", cluster='local' if args.num_nodes == 1 else 'slurm')
     executor.update_parameters(
         tasks_per_node=args.num_gpus,
         nodes=args.num_nodes,
@@ -128,5 +128,6 @@ if __name__ == "__main__":
         slurm_partition=args.slurm_partition,
         mem_gb=240,
         slurm_time='24:00:00',
+        timeout_min=600,
     )
     job = executor.submit(distributed_livechat_generation, args)
