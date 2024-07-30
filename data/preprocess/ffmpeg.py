@@ -14,7 +14,7 @@ class LiveOnePlusEncodingArguments(LiveOnePlusTrainingArguments):
     
 if __name__ == "__main__":
     args, = transformers.HfArgumentParser(LiveOnePlusEncodingArguments).parse_args_into_dataclasses()
-    executor = submitit.AutoExecutor(folder=f"outputs/preprocess/")
+    executor = submitit.AutoExecutor(folder=f"outputs/preprocess/", cluster='local' if args.num_nodes == 1 else 'slurm')
     task = partial(distributed_ffmpeg, src_root=args.video_dir, resolution=args.frame_resolution, fps=args.frame_fps)
     executor.update_parameters(
         tasks_per_node=args.num_gpus,
@@ -24,5 +24,6 @@ if __name__ == "__main__":
         cpus_per_task=10,
         mem_gb=240,
         slurm_time='24:00:00',
+        timeout_min=600,
     )
     job = executor.submit(task)
