@@ -29,6 +29,12 @@ This is the official implementation of [VideoLLM-online: Online Video Large Lang
 python -m demo.app --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus
 ```
 
+But if there are some bugs with flash-attn, try to use 
+
+```
+python -m demo.app --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus --attn_implementation sdpa
+```
+
 - (Recommended) Launch the CLI locally with:
 ```sh
 python -m demo.cli --resume_from_checkpoint chenjoya/videollm-online-8b-v1plus
