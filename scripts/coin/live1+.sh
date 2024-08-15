@@ -1,4 +1,4 @@
-deepspeed train.py --deepspeed configs/deepspeed/zero1.json \
+torchrun --nproc_per_node=8 --standalone train.py --deepspeed configs/deepspeed/zero1.json \
     --live_version live1+ \
     --train_datasets coin_step_train coin_next_train coin_task_train coin_procedure_train coin_taskprocedure_train \
     --eval_datasets coin_step_test coin_next_test coin_task_test coin_procedure_test coin_taskprocedure_test \
@@ -9,8 +9,9 @@ deepspeed train.py --deepspeed configs/deepspeed/zero1.json \
     --gradient_checkpointing True \
     --eval_strategy no \
     --prediction_loss_only False \
-    --save_strategy no \
-    --learning_rate 0.0002 \
+    --save_strategy epoch \
+    --save_steps 1 \
+    --learning_rate 0.0001 \
     --optim adamw_torch \
     --lr_scheduler_type cosine \
     --warmup_ratio 0.05 \

@@ -1,4 +1,4 @@
-deepspeed evaluate.py \
+torchrun --nproc_per_node=8 --standalone evaluate.py \
     --live_version live1+ \
     --eval_datasets coin_step_test coin_next_test coin_task_test coin_procedure_test coin_taskprocedure_test \
     --per_device_train_batch_size 1 \
@@ -8,5 +8,5 @@ deepspeed evaluate.py \
     --bf16 True \
     --tf32 True \
     --report_to tensorboard \
-    --output_dir outputs/coin_benchmarks/live1+ \
-    --resume_from_checkpoint /path/your/lora_ckpt_folder
+    --output_dir outputs/coin_benchmarks/live1+/ \
+    --resume_from_checkpoint outputs/coin_benchmarks/live1+/

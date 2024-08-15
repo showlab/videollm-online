@@ -3,19 +3,21 @@
 #### Sample video frames to 2 FPS and max resolution 384 (with zero padding)
 
 ```
-python -m data.preprocess.ffmpeg --num_gpus 8 --frame_fps 2 --frame_resolution 384 --video_dir datasets/ego4d/v2/full_scale
+python -m data.preprocess.ffmpeg --num_gpus 8 --frame_fps 2 --frame_resolution 384 --num_tasks 16 --video_dir datasets/ego4d/v2/full_scale
 ```
 
 - Please run the script in ```videollm-online/``` root folder.
 
 - The results will be saved in a new folder with '{fps}fps_{resolution}' suffix. For example, ```datasets/ego4d/v2/full_scale -> datasets/ego4d/v2/full_scale_2fps_384```.
 
-- If you are on a cluster, you can set ```--num_nodes ... --slurm_partition ...``` to use them. The more nodes and GPUs, the faster preprocessing.
+- Increase ```--num_tasks``` according to the CPU cores. 1/10 number of CPU cores is recommended.
+
+- If you are on a cluster, you can set ```--num_nodes ... --slurm_partition ...``` to use them. The more nodes, the faster preprocessing.
 
 #### Encode sampled 2fps_384 video frames
 
 ```
-python -m data.preprocess.encode --num_gpus 8 --video_dir datasets/ego4d/v2/full_scale_2fps_384 --vision_pretrained google/siglip-large-patch16-384
+python -m data.preprocess.encode --num_gpus 8 --vision_pretrained google/siglip-large-patch16-384 --video_dir datasets/ego4d/v2/full_scale_2fps_384 
 ```
 
 - Please run the script in ```videollm-online/``` root folder.

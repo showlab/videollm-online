@@ -22,12 +22,9 @@ class COIN:
                 text=COIN._clean_step(step['label']),
             ) for step in anno['annotation']],
         } for video_uid, anno in annos.items() if (split in anno['subset'].lower()) and (video_uid in self.metadata)]
-        self.tasks_categories = list(set([v['task'].capitalize() + '.' for v in self._annos]))
-        self.steps_categories = list(set([step['text'].capitalize() + '.' for steps in self._annos for step in steps['steps']]))
+        self.task_categories = list(set([v['task'].lower() for v in self._annos]))
+        self.step_categories = list(set([step['text'].lower() for steps in self._annos for step in steps['steps']]))
         self.annos: list[dict]
-
-    def __len__(self):
-        return len(self.annos)
 
     def get_metadata(self, ):
         metadata_path = f'{self.embed_dir}_metadata.json'

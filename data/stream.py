@@ -88,7 +88,7 @@ class StreamMixIn(torch.utils.data.Dataset):
             frames = load_ranges
         elif load_ranges is not None:
             conversation, load_ranges = self.max_frames_clip(conversation, load_ranges, self.max_num_frames)
-            frames = torch.cat([torch.load(path)[ranger] for path, ranger in load_ranges.items()])
+            frames = torch.cat([torch.load(path, weights_only=True)[ranger] for path, ranger in load_ranges.items()])
         else:
             frames = torch.tensor([])
         # 2. prepare texts

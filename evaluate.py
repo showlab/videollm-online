@@ -27,7 +27,7 @@ def evaluate():
             metric_key_prefix=f"eval_{eval_dataset_name}",
         )
         metrics.update(dataset_metrics)
-        print(metrics)
+    print(metrics)
 
 if __name__ == "__main__":
     evaluate()

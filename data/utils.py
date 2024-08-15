@@ -65,7 +65,7 @@ def ffmpeg_once(src_path: str, dst_path: str, *, fps: int = None, resolution: in
     command += [dst_path]
     subprocess.run(command, check=True)
 
-def distributed_ffmpeg(*, src_root: str, fps: int = None, resolution: int = None, pad: str = '#000000', mode='bicubic', **kwargs):
+def distributed_ffmpeg(*, src_root: str, fps: int = None, resolution: int = None, pad: str = '#000000', mode='bicubic'):
     import submitit
     env = submitit.JobEnvironment()
     src_root = src_root.rstrip('/')
@@ -81,14 +81,14 @@ def distributed_ffmpeg(*, src_root: str, fps: int = None, resolution: int = None
         if i % env.num_tasks != env.global_rank:
             continue
         dst_path = src_path.replace(src_root, dst_root)
-        ffmpeg_once(src_path, dst_path, fps=fps, resolution=resolution, pad=pad)
+        ffmpeg_once(src_path, dst_path, fps=fps, resolution=resolution, pad=pad, mode=mode)
 
 def distributed_encode(*, src_root: str, vision_pretrained: str, vision_encode: callable, batch_size: int, embed_mark: str, save_bf16: bool = False, **kwargs):
     env = submitit.JobEnvironment()
     src_root = src_root.rstrip('/')
     model = AutoModel.from_pretrained(vision_pretrained, device_map=f'cuda:{env.local_rank}').vision_model
     model.eval()
-    dst_root = f"{src_root}_{embed_mark}_{vision_pretrained.replace('/', '--')}"
+    dst_root = f"{src_root}_{embed_mark.split('_')[-1]}_{vision_pretrained.replace('/', '--')}"
     os.makedirs(dst_root, exist_ok=True)
     for i, file in tqdm.tqdm(enumerate(os.listdir(src_root)), desc=f'{src_root} -> {dst_root}'):
         if i % env.num_tasks != env.global_rank:

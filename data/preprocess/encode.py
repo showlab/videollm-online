@@ -36,3 +36,4 @@ if __name__ == "__main__":
         timeout_min=600,
     )
     job = executor.submit(task)
+    job.results()

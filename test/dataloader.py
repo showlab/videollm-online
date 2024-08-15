@@ -31,19 +31,13 @@ if __name__ == '__main__':
 
     if eval_dataset_dict:
         for dataset_name, dataset in eval_dataset_dict.items():
-            max_length = 0
-            all_length = 0
             dl = DataLoader(dataset, batch_size=1, collate_fn=collator_fn, shuffle=False, num_workers=16, drop_last=False)
             dummy_predictions, label_ids = [], []
             for i, batch in enumerate(tqdm.tqdm(dl, desc=f'debug run for evaluation')):
                 length = (batch.labels != -100).sum()
-                max_length = max(max_length, length)
-                all_length += length
-                print(tokenizer.decode(batch.input_ids[0]))
-                # dummy_predictions.append(torch.rand(len(batch.choices)))
+                # print(tokenizer.decode(batch.input_ids[0]))
+                dummy_predictions.append(torch.tensor(tokenizer('\n'.join(dataset.labels[batch.sample_idxs[0]])).input_ids[1:]))
                 label_ids.append(batch.sample_idxs)
-            print('avg_length', all_length / len(train_dataset))
-            print('max_length', max_length)
             print(compute_metrics_dict[dataset_name](
                 transformers.EvalPrediction(
                     predictions=torch.nn.utils.rnn.pad_sequence(dummy_predictions, batch_first=True, padding_value=-100).numpy(),

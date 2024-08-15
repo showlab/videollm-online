@@ -1,4 +1,4 @@
-import Levenshtein as lev
+import Levenshtein
 import numpy as np
 from transformers import PreTrainedTokenizer, EvalPrediction
 
@@ -11,16 +11,18 @@ class COINBenchmark(COIN, StreamMixIn):
 
     @staticmethod
     def fuzzy_match(text, choices):
-        scores = [-lev.distance(text, choice) for choice in choices]
-        return scores.index(max(scores))
+        return min([(Levenshtein.distance(text, choice), choice) for choice in choices])[1]
 
     def compute_metrics(self, eval_predictions: EvalPrediction, tokenizer: PreTrainedTokenizer, **kwargs):
         batch_pred_tensor, sample_idxs = eval_predictions.predictions, eval_predictions.label_ids
-        batch_pred_tensor = batch_pred_tensor.clip(min=0)
+        batch_pred_tensor[batch_pred_tensor < 0] = tokenizer.bos_token_id # not use clamp(min=0), since 0 is ! in Llama-3 tokenizer and may affect matching
         predictions = tokenizer.batch_decode(batch_pred_tensor, skip_special_tokens=True, clean_up_tokenization_spaces=True)
-        predictions = np.array([self.fuzzy_match(text, self.mapping_categories) for text in predictions])
-        accuracy = (predictions == np.array(self.answers)).mean()
-        return dict(accuracy=accuracy)
+        correct = 0
+        for prediction, label in zip(predictions, self.labels[sample_idxs]): # should be self.labels[sample_idx] to get the correct order
+            prediction = prediction.lower().rstrip('.')
+            if prediction == label or self.fuzzy_match(prediction, self.categories) == label:
+                correct += 1
+        return dict(accuracy=correct / len(predictions) * 100) # * 100
 
     def __getitem__(self, index):
         anno = self.annos[index]
@@ -36,14 +38,14 @@ class COINStep(COINBenchmark):
         super().__init__(split=split, frame_fps=frame_fps, is_training=is_training, **kwargs)
         self.is_training = is_training
         self.frame_fps = frame_fps
-        self.annos = []
-        self.answers, self.mapping_categories = [], self.steps_categories
+        self.annos, self.labels = [], []
         for anno in self._annos:
             video_uid = anno['video_uid']
             duration = self.metadata[video_uid]['duration']
             steps = anno['steps']
             for i in range(len(steps)):
                 response = steps[i]['text'].capitalize() + '.'
+                self.labels.append(steps[i]['text'].lower())
                 start_time = ceil_time_by_fps(steps[i]['start'], frame_fps, min_time=0, max_time=duration)
                 end_time = ceil_time_by_fps(steps[i]['end'], frame_fps, min_time=0, max_time=duration)
                 start_frame = int(start_time * frame_fps)
@@ -57,7 +59,8 @@ class COINStep(COINBenchmark):
                     'conversation': conversation,
                     'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
                 })
-                self.answers.append(self.mapping_categories.index(response))
+        self.labels = np.array(self.labels) # for fast indexing
+        self.categories = self.step_categories
 
 def build_coin_step_train(**kwargs):
     return COINStep(split='train', **kwargs)
@@ -74,14 +77,14 @@ class COINNext(COINBenchmark):
         super().__init__(split=split, frame_fps=frame_fps, is_training=is_training, **kwargs)
         self.is_training = is_training
         self.frame_fps = frame_fps
-        self.annos = []
-        self.answers, self.mapping_categories = [], self.steps_categories
+        self.annos, self.labels = [], []
         for anno in self._annos:
             video_uid = anno['video_uid']
             duration = self.metadata[video_uid]['duration']
             steps = anno['steps']
             for i in range(len(steps) - 1):
                 response = steps[i+1]['text'].capitalize() + '.'
+                self.labels.append(steps[i+1]['text'].lower())
                 start_time = ceil_time_by_fps(steps[i]['start'], frame_fps, min_time=0, max_time=duration)
                 end_time = ceil_time_by_fps(steps[i]['end'], frame_fps, min_time=0, max_time=duration)
                 start_frame = int(start_time * frame_fps)
@@ -95,7 +98,8 @@ class COINNext(COINBenchmark):
                     'conversation': conversation,
                     'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
                 })
-                self.answers.append(self.mapping_categories.index(response))
+        self.labels = np.array(self.labels) # for fast indexing
+        self.categories = self.step_categories
 
 def build_coin_next_train(**kwargs):
     return COINNext(split='train', **kwargs)
@@ -112,12 +116,12 @@ class COINTask(COINBenchmark):
         super().__init__(split=split, frame_fps=frame_fps, is_training=is_training, **kwargs)
         self.is_training = is_training
         self.frame_fps = frame_fps
-        self.annos = []
-        self.answers, self.mapping_categories = [], self.tasks_categories
+        self.annos, self.labels = [], []
         for anno in self._annos:
             video_uid = anno['video_uid']
             duration = self.metadata[video_uid]['duration']
             response = anno['task'].capitalize() + '.'
+            self.labels.append(anno['task'].lower())
             start_time = ceil_time_by_fps(anno['start'], frame_fps, min_time=0, max_time=duration)
             end_time = ceil_time_by_fps(anno['end'], frame_fps, min_time=0, max_time=duration)
             start_frame = int(start_time * frame_fps)
@@ -131,7 +135,8 @@ class COINTask(COINBenchmark):
                 'conversation': conversation,
                 'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
             })
-            self.answers.append(self.mapping_categories.index(response))
+        self.labels = np.array(self.labels) # for fast indexing
+        self.categories = self.task_categories
 
 def build_coin_task_train(**kwargs):
     return COINTask(split='train', **kwargs)
@@ -149,8 +154,7 @@ class COINProcedure(COINBenchmark):
         super().__init__(split=split, frame_fps=frame_fps, is_training=is_training, **kwargs)
         self.is_training = is_training
         self.frame_fps = frame_fps
-        self.annos = []
-        self.answers, self.mapping_categories = [], self.steps_categories
+        self.annos, self.labels = [], []
         for anno in self._annos:
             video_uid = anno['video_uid']
             duration = self.metadata[video_uid]['duration']
@@ -168,30 +172,34 @@ class COINProcedure(COINBenchmark):
                         {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = next_steps[0]['text'].capitalize() + '.'
+                    self.labels.append(np.array([next_steps[0]['text'].lower()]))
                 else:
                     conversation = [
                         COINProcedure.user_message(num_next_steps),
                         {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = '\n'.join(f"{i+1}. {s['text'].capitalize()}." for i, s in enumerate(next_steps))
+                    self.labels.append(np.array([s['text'].lower() for s in next_steps]))
                 conversation.append({"role": "assistant", "content": response, 'learn': True})
                 self.annos.append({
                     'conversation': conversation,
                     'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
                 })
-                self.answers.append([self.mapping_categories.index(step['text'].capitalize() + '.') for step in next_steps])
+        self.categories = self.step_categories
 
     def compute_metrics(self, eval_predictions: EvalPrediction, tokenizer: PreTrainedTokenizer, **kwargs):
         batch_pred_tensor, sample_idxs = eval_predictions.predictions, eval_predictions.label_ids
-        batch_pred_tensor = batch_pred_tensor.clip(min=0)
-        batch_pred_text = tokenizer.batch_decode(batch_pred_tensor, skip_special_tokens=True, clean_up_tokenization_spaces=True)
-        predictions = []
-        for pred_text in batch_pred_text:
-            pred_steps = pred_text.split('\n')
-            predictions.append([self.fuzzy_match(step, self.mapping_categories) for step in pred_steps])
-        total_num_steps = len(sum(self.answers, []))
-        correct_num_steps = sum([sum(1 for p, a in zip(prediction, answer) if p == a) for prediction, answer in zip(predictions, self.answers)])
-        return {'accuracy': correct_num_steps / total_num_steps}
+        batch_pred_tensor[batch_pred_tensor < 0] = tokenizer.bos_token_id
+        predictions = tokenizer.batch_decode(batch_pred_tensor, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+        correct, total = 0, 0
+        labels = [self.labels[i] for i in sample_idxs]
+        for prediction_steps, label_steps in zip(predictions, labels):
+            for prediction_step, label_step in zip(prediction_steps.split('\n'), label_steps):
+                prediction_step = prediction_step.split('. ')[-1]
+                if prediction_step == label_step or self.fuzzy_match(prediction_step, self.categories) == label_step:
+                    correct += 1
+                total += 1
+        return {'accuracy': correct / total * 100}
 
 def build_coin_procedure_train(**kwargs):
     return COINProcedure(split='train', **kwargs)
@@ -213,8 +221,7 @@ class COINTaskProcedure(COINBenchmark):
         super().__init__(split=split, frame_fps=frame_fps, is_training=is_training, **kwargs)
         self.is_training = is_training
         self.frame_fps = frame_fps
-        self.annos = []
-        self.answers, self.mapping_categories = [], self.steps_categories
+        self.annos, self.labels = [], []
         for anno in self._annos:
             video_uid = anno['video_uid']
             duration = self.metadata[video_uid]['duration']
@@ -232,18 +239,20 @@ class COINTaskProcedure(COINBenchmark):
                         {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = next_steps[0]['text'].capitalize() + '.'
+                    self.labels.append([next_steps[0]['text'].lower()])
                 else:
                     conversation = [
                         COINTaskProcedure.get_query_multi(anno['task'], num_next_steps),
                         {"role": "stream", 'num_frames': end_frame - start_frame, 'learn': True}
                     ]
                     response = '\n'.join(f"{i+1}. {s['text'].capitalize()}." for i, s in enumerate(next_steps))
+                    self.labels.append([s['text'].lower() for s in next_steps])
                 conversation.append({"role": "assistant", "content": response, 'learn': True})
                 self.annos.append({
                     'conversation': conversation,
                     'load_ranges': {self.metadata[video_uid]['path']: range(start_frame, end_frame)}
                 })
-                self.answers.append([self.mapping_categories.index(step['text'].capitalize() + '.') for step in next_steps])
+        self.categories = self.step_categories
 
     def compute_metrics(self, *args, **kwargs):
         return COINProcedure.compute_metrics(self, *args, **kwargs)
