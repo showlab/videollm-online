@@ -1,3 +1,5 @@
+### Updates! Our new paper: [LiveCC: Learning Video LLM with Streaming Speech Transcription at Scale](https://huggingface.co/papers/2504.16030). All resources, including the training video data, have been released at [LiveCC Webpage](https://showlab.github.io/livecc/)
+
 ## <img src="demo/assistant_rectangle.png" height="25"> VideoLLM-online: Online Video Large Language Model for Streaming Video
 
 <a href="https://showlab.github.io/videollm-online/" target="_blank"><img alt="Homepage" src="https://img.shields.io/badge/🌍 Homepage-d35400?color=d35400" /></a>
