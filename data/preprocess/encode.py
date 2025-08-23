@@ -1,39 +1,34 @@
-import submitit, functools, transformers
-from dataclasses import asdict, dataclass
+import submitit, functools, argparse
 from models.vision_live import build_live_vision
-
-from models.configuration_live import LiveConfigMixin
-from models.arguments_live import LiveOnePlusTrainingArguments
 from ..utils import distributed_encode
 
-@dataclass
-class LiveOnePlusEncodingArguments(LiveOnePlusTrainingArguments):
-    num_nodes: int = 1
-    num_gpus: int = 8
-    video_dir: str = 'datasets/ego4d/v2/full_scale_2fps_384'
-    slurm_partition: str = None
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--nodes', type=int, default=32)
+    parser.add_argument('--vision_pretrained', type=str, default='google/siglip-large-patch16-384')
+    parser.add_argument('--ffmpeg', type=str, default='2fps_384')
+    parser.add_argument('--tokens', type=str, default='1+3x3')
+    args = parser.parse_args()
+    return args
 
 if __name__ == "__main__":
-    args, = transformers.HfArgumentParser(LiveOnePlusEncodingArguments).parse_args_into_dataclasses()
-    vision_config = LiveConfigMixin(**asdict(args))
-    _, vision_encode = build_live_vision(vision_config)
+    args = get_args()
+    _, vision_encode = build_live_vision(vision_pretrained=args.vision_pretrained, frame_strategy=f'{args.ffmpeg}_{args.tokens}')
     task = functools.partial(
-        distributed_encode, src_root=args.video_dir, 
-        vision_pretrained=args.vision_pretrained, 
-        embed_mark=args.embed_mark, 
-        vision_encode=vision_encode, 
-        batch_size=256, save_bf16=True
+        distributed_encode, src_root=f'datasets/ego4d/v2/full_scale_{args.ffmpeg}', 
+        vision_pretrained=args.vision_pretrained, vision_encode=vision_encode, 
+        batch_size=256, tokens=args.tokens, save_bf16=True
     )
-    executor = submitit.AutoExecutor(folder=f"outputs/preprocess/", cluster='local' if args.num_nodes == 1 else 'slurm')
+    executor = submitit.AutoExecutor(folder=f"outputs/preprocess/")
     executor.update_parameters(
-        tasks_per_node=args.num_gpus,
-        nodes=args.num_nodes,
-        gpus_per_node=args.num_gpus,
+        tasks_per_node=8,
+        nodes=args.nodes,
+        gpus_per_node=8,
         cpus_per_task=10,
-        slurm_partition=args.slurm_partition,
+        slurm_partition='learnfair',
+        slurm_constraint='volta32gb',
         mem_gb=240,
         slurm_time='24:00:00',
-        timeout_min=600,
+        # slurm_qos='eht_ava',
     )
     job = executor.submit(task)
-    job.results()

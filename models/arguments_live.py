@@ -3,10 +3,11 @@ from transformers import TrainingArguments
 
 @dataclass
 class LiveTrainingArguments(TrainingArguments):
-    live_version: str = 'live1+'
-    system_prompt: str = (
-        "A multimodal AI assistant is helping users with some activities."
-        " Below is their conversation, interleaved with the list of video frames received by the assistant."
+    live_version: str = None
+    system_prompt: str = ("A dialogue between a user and a streaming video AI assistant."
+        " The assistant will continuously answer the user's query according to the video and conversation contexts up to the current time."
+        " However, if it is redundant to respond, the assistant will remain silent."
+        " Below is their conversation, interleaved with the video frames."
     )
     train_datasets: list[str] = None
     eval_datasets: list[str] = None
@@ -26,12 +27,15 @@ class LiveTrainingArguments(TrainingArguments):
     augmentation: bool = False
     attn_implementation: str = 'flash_attention_2'
     output_dir: str = 'outputs/debug'
+    vision_drop_strategy: str = None
+    is_mod_weighted: bool = True
+    mod_warmup_steps: int = 0
+    is_return_vision_weights: bool = False
 
 @dataclass
 class LiveOneTrainingArguments(LiveTrainingArguments):
     live_version: str = 'live1'
     frame_token_cls: bool = True
-    frame_num_tokens: int = 1
     frame_token_interval: str  = ''
     embed_mark: str = '2fps_384_1'
     max_num_frames: int = 7200 # 1h, 2fps, 7200 frames
@@ -41,9 +45,8 @@ class LiveOnePlusTrainingArguments(LiveTrainingArguments):
     live_version: str = 'live1+'
     frame_token_cls: bool = True
     frame_token_pooled: list[int] = field(default_factory=lambda: [3,3])
-    frame_num_tokens: int = 10 # 1+3x3
+    frame_token_interval: str = '|'
     embed_mark: str = '2fps_384_1+3x3'
-    frame_token_interval: str = ','
     max_num_frames: int = 1200 # 10min, 2fps, 1200 frames
 
 def get_args_class(live_version: str):

@@ -25,8 +25,7 @@ def data_collator(batch: list[list], *, tokenizer: PreTrainedTokenizer, **kwargs
     batch.pop('offset_mapping')
     batch['frames'] = torch.cat(batch_frames)
     batch['sample_idxs'] = torch.tensor(batch_sample_idx)
-    if batch_evaluation_kwargs[0]:
-        batch['evaluation_kwargs'] = batch_evaluation_kwargs[0] # evaluation only supports bs = 1, so its okay
+    batch['evaluation_kwargs'] = batch_evaluation_kwargs[0] # evaluation only supports bs = 1, so its okay
     return batch
 
 def get_data_collator(**kwargs):

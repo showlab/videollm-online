@@ -1,6 +1,6 @@
 import torch, os
 from peft import LoraConfig, get_peft_model, PeftModel
-from transformers import AutoModelForCausalLM, Cache
+from transformers import AutoModelForCausalLM
 from transformers.utils import logging
 
 from .tokenization_live import build_live_tokenizer_and_update_config
@@ -10,7 +10,7 @@ logger = logging.get_logger(__name__)
 
 class LiveMixin(AutoModelForCausalLM):
     def set_vision_inside(self):
-        logger.warning_once("!!! Set vision encoder in the model, only recommended for on in-the-wild inference. "
+        logger.warning_once("!!!Set vision encoder in the model, only recommended for on in-the-wild inference. "
             "Please dont call this for efficient training & evaluation. Instead, do visual feature pre-extraction.")
         self.vision_encoder, self.vision_encode = build_live_vision(self.config)
 
@@ -18,7 +18,10 @@ class LiveMixin(AutoModelForCausalLM):
         del self.vision_encoder
         del self.vision_encode
 
-    def visual_embed(self, frames: torch.Tensor):
+    def get_input_embeddings(self):
+        return self.llm.get_input_embeddings()
+
+    def vision_embed(self, frames: torch.Tensor):
         if hasattr(self, 'vision_encode'):
             with torch.cuda.amp.autocast():
                 frames = self.vision_encode(self.vision_encoder, frames)
@@ -34,11 +37,11 @@ class LiveMixin(AutoModelForCausalLM):
         if frames is None:
             return self.get_input_embeddings()(input_ids)
         if input_ids is None:
-            return self.visual_embed(frames)
+            return self.vision_embed(frames)
         inputs_embeds = self.get_input_embeddings()(input_ids.clamp(max=self.vocab_size-1))
         v_mask = input_ids == self.config.v_placeholder_id
         if v_mask.any():
-            inputs_embeds[v_mask] = self.visual_embed(frames)
+            inputs_embeds[v_mask] = self.vision_embed(frames)
         return inputs_embeds
 
     @torch.no_grad()
@@ -46,7 +49,7 @@ class LiveMixin(AutoModelForCausalLM):
         self,
         input_ids: torch.LongTensor,
         labels: torch.LongTensor,
-        frames: torch.Tensor,
+        frames: torch.ByteTensor,
         ignore_token_id: int = -100,
         frame_token_interval_threshold: float = 0.0,
         **kwargs
@@ -170,17 +173,6 @@ class LiveMixin(AutoModelForCausalLM):
     def trim_past_key_values(self, past_key_values, start, stop):
         return [[past_keys[:,:,start:stop], past_values[:,:,start:stop]] for past_keys, past_values in past_key_values]
 
-def fast_greedy_generate(*, model: LiveMixin, inputs_embeds: torch.Tensor, past_key_values: Cache, eos_token_id: int, inplace_output_ids: torch.Tensor):
-    for i in range(inplace_output_ids.size(1)):
-        outputs = model(inputs_embeds=inputs_embeds, past_key_values=past_key_values, use_cache=True)
-        past_key_values = outputs.past_key_values
-        new_token_id = outputs.logits[:, -1:].argmax(dim=-1)
-        inplace_output_ids[:, i] = new_token_id
-        if new_token_id == eos_token_id:
-            break
-        inputs_embeds = model.get_input_embeddings()(new_token_id)
-    return inplace_output_ids[:, :i+1], past_key_values
-
 def build_live(
     *,
     is_training: bool,
@@ -212,11 +204,10 @@ def build_live(
         model = get_peft_model(model, lora_config)
         model.print_trainable_parameters()
     else:
-        if resume_from_checkpoint:
+        try:
             model = PeftModel.from_pretrained(model, resume_from_checkpoint, is_trainable=False)
-        else:
+        except:
             logger.warning(f'!!! Fail to load checkpoint: {resume_from_checkpoint}. Return a new initialized model.')
         if set_vision_inside:
             model.set_vision_inside()
-        model.requires_grad_(False)
     return model, tokenizer

@@ -5,7 +5,7 @@ from ..stream import StreamMixIn
 from ..utils import ceil_time_by_fps, floor_time_by_fps, rand_bool, DictWithTo
 
 class Ego4DGoalStepLiveChat(Ego4D, StreamMixIn):
-    anno_path = 'datasets/ego4d/v2/annotations/goalstep_livechat_trainval_filtered_21k.json'
+    anno_path = 'datasets/ego4d/v2/annotations/goalstep_livechat_trainval.json'
     evaluation_kwargs = DictWithTo(evaluator='generate')
 
     def __init__(self, *, frame_fps: int, is_training: bool, **kwargs):
@@ -30,7 +30,7 @@ class Ego4DGoalStepLiveChat(Ego4D, StreamMixIn):
             waiting_frames = random.randint(0, min(20, int(fps_time * frame_fps)))
             conversation = []
             if waiting_frames:
-                conversation.append({'role': 'stream', 'num_frames': waiting_frames, 'learn': waiting_frames - 1})
+                conversation.append({'role': 'stream', 'num_frames': waiting_frames, 'learn': True})
             conversation.append({'role': 'user', 'content': content, 'time': time, 'fps_time': fps_time})
             start_fps_time = fps_time - (waiting_frames - 1) / frame_fps
             # 2. for loop to add message

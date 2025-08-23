@@ -1,3 +1,12 @@
+export TOKENIZERS_PARALLELISM=false
+if [ -n "$MASTER_ADDR" ]; then
+    launcher="torchrun --nproc_per_node 8 --nnodes $SLURM_NNODES --node_rank $SLURM_PROCID --master_addr $MASTER_ADDR --master_port $MASTER_PORT"
+    nnodes=$SLURM_NNODES
+else
+    launcher="torchrun --nproc_per_node 8"
+    nnodes=1
+fi
+
 $launcher train.py --deepspeed configs/deepspeed/zero1.json \
     --live_version live1+ \
     --train_datasets ego4d_lta_train \

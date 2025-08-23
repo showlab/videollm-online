@@ -6,6 +6,7 @@ class Templates:
         "What was I doing earlier?",
         "Can you summarize what I've accomplished so far?",
         "What tasks have I completed?",
+        "How long did it take me to finish that task?",
         "What was the outcome of my previous action?",
         "Did I succeed in what I was trying to do?",
         "What were the steps I took to achieve that?",
@@ -32,7 +33,7 @@ class Templates:
         "Can you verify the accuracy of my work?",
         "What were the key metrics I was tracking?",
         "How does what I did impact the bigger picture?",
-        "Can you provide a summary of my actions?",
+        "Can you provide a timeline of my actions?",
         "What were the dependencies involved?",
         "Did I collaborate with anyone?",
         "What was the scope of my project?",
@@ -52,7 +53,6 @@ class Templates:
         "Can you recreate the steps I took?",
         "What were the outcomes I expected?",
         "What done?",
-        "please summarize."
     ]
     currents = [
         "What am I doing right now?",
@@ -62,6 +62,7 @@ class Templates:
         "What are the key steps involved in what I'm doing?",
         "Can you break down my current task into smaller steps?",
         "What are the resources I'm using right now?",
+        "How long do you think it will take me to finish this task?",
         "What are the potential obstacles I might face?",
         "Can you provide guidance on what I'm doing?",
         "What are the benefits of what I'm doing now?",
@@ -104,7 +105,6 @@ class Templates:
         "What are the milestones I should achieve?",
         "How does what I'm doing now impact my future tasks?",
         "Now?",
-        "current?"
     ]
     nexts = [
         "What should I do next?",
@@ -121,6 +121,7 @@ class Templates:
         "How does what I should do next impact the bigger picture?",
         "Can you analyze my approach for the next task?",
         "What are the resources I'll need for the next task?",
+        "How long do you think it will take me to finish the next task?",
         "What are the dependencies involved in the next task?",
         "Can you provide guidance on what I should do next?",
         "What are the opportunities I should seize in the next task?",
@@ -149,14 +150,13 @@ class Templates:
         "What are the opportunities I should consider in the next task?",
         "Can you highlight the most critical aspects of the next task?",
         "What are the skills I need to develop for the next task?",
-        "Can you provide an instruction for the next task?",
+        "Can you provide a timeline for the next task?",
         "What are the milestones I should achieve in the next task?",
         "How does what I should do next impact my future tasks?",
         "Can you reflect on my progress so far?",
         "What are the next steps I should take?",
         "Can you recommend a course of action?",
         "Next?",
-        "nexts?"
     ]
     casuals = ['...'] * 50
     queries = pasts + currents + nexts + casuals

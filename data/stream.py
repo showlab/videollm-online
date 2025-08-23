@@ -1,4 +1,5 @@
-import torch, random
+import torch, torchvision, random
+torchvision.set_video_backend("video_reader")
 from transformers import PreTrainedTokenizer
 
 from .utils import rand_bool
@@ -13,64 +14,39 @@ class StreamMixIn(torch.utils.data.Dataset):
         self.max_num_frames = max_num_frames
         assert system_prompt is not None, 'Please add a system prompt'
 
-    # NOTE: this augmentation is to reduce the text dependency
-    def augment(self, conversation): 
-        if not self.augmentation or not self.is_training:
-            return conversation
-        assistant_messages = [(i, message) for i, message in enumerate(conversation) if message['role'] == 'assistant' and message.get('learn', False)]
-        if len(assistant_messages) <= 1:
-            return conversation
-        i, assistant_message_i = random.choice(assistant_messages[:-1]) # do not choose the last one, since its meaningless to dependency
-        real_content = assistant_message_i['content']
-        fake_contents = list(set(message['content'] for _, message in assistant_messages if message['content'] != real_content)) + [''] + [None]
-        fake_content = random.choice(fake_contents)
-        fake_message_i = {'role': 'assistant', 'content': fake_content, 'learn': False} if fake_content is not None else None
-        if rand_bool(): # fix the wrong content at the next frame
-            # case1: ... fake_message, frame, real_message, stream - 1 ...
-            if fake_message_i is not None and conversation[i+1]['role'] == 'stream' and conversation[i+1]['num_frames'] > 1: 
-                conversation = conversation[:i] + [
-                    fake_message_i,
-                    {'role': 'stream', 'num_frames': 1, 'learn': True}, 
-                    {'role': 'assistant', 'content': f'(Sorry, the last response is wrong) {real_content}', 'learn': True},
-                    {'role': 'stream', 'num_frames': conversation[i+1]['num_frames'] - 1, 'learn': True}
-                ] + conversation[i+2:]
-            # case2: ... stream + 1, real_message, stream -1, ...
-            elif fake_message_i is None and conversation[i-1]['role'] == 'stream' and conversation[i+1]['role'] == 'stream' and conversation[i+1]['num_frames'] > 1: 
-                conversation = conversation[:i-1] + [
-                    {'role': 'stream', 'num_frames': conversation[i-1]['num_frames'] + 1, 'learn': conversation[i-1]['num_frames'] - 1},
-                    {'role': 'assistant', 'content': real_content, 'learn': True},
-                    {'role': 'stream', 'num_frames': conversation[i+1]['num_frames'] - 1, 'learn': True}
-                ] + conversation[i+2:]
-        else: # not fix
-            # case3: ... fake_message, stream (unlearn) / message ...
-            if fake_message_i is not None:
-                if conversation[i+1]['role'] == 'stream': 
-                    conversation = conversation[:i] + [
-                        fake_message_i,
-                        {'role': 'stream', 'num_frames': conversation[i+1]['num_frames'], 'learn': False}, 
-                    ] + conversation[i+2:]
-                else:
-                    conversation = conversation[:i] + [fake_message_i] + conversation[i+1:]
-            # case4: ... stream (learn-1), stream (unlearn) / message ...
-            else: 
-                if conversation[i-1]['role'] == 'stream':
-                    if conversation[i+1]['role'] != 'stream':
-                        conversation = conversation[:i-1] + [
-                            {'role': 'stream', 'num_frames': conversation[i-1]['num_frames'], 'learn': conversation[i-1]['num_frames'] - 1},
-                        ] + conversation[i+1:]
-                    else:
-                        conversation = conversation[:i-1] + [
-                            {'role': 'stream', 'num_frames': conversation[i-1]['num_frames'] + conversation[i+1]['num_frames'], 'learn': conversation[i-1]['num_frames'] - 1}, 
-                        ] + conversation[i+2:]
-                else:
-                    if conversation[i+1]['role'] == 'stream':
-                        conversation = conversation[:i] + [
-                            {'role': 'stream', 'num_frames': conversation[i+1]['num_frames'], 'learn': False}, 
-                        ] + conversation[i+2:]
-                    else:
-                        conversation = conversation[:i] + conversation[i+1:]
+    # NOTE: algorithm:
+    # if augmentation, randomly choose a assistant response r, make the following augmentation:
+    # 1. 50% prob, randomly shift left random x frames or randomly shift right random x frames
+    # 2. 50% prob, randomly replace r to any responses in the video
+    # 3. make the augmented segment not learn. other parts are still learned.
+    def augment(self, conversation): # user, stream, assistant, stream, assistant
+        assistant_messages = [(i, message) for i, message in enumerate(conversation) if message['role'] == 'assistant']
+        if self.augmentation and rand_bool() and self.is_training and len(assistant_messages) >= 2: # 2 round
+            i, correct_assistant = random.choice(assistant_messages[:-1])
+            content_to_replace = random.choice(list(set([message['content'] for message in conversation if 'assistant' == message['role']])) + [''])
+            last_num_frames = conversation[i-1]['num_frames'] if conversation[i - 1]['role'] == 'stream' else 0
+            next_num_frames = conversation[i+1]['num_frames'] if conversation[i + 1]['role'] == 'stream' else 0
+            if last_num_frames > 1 and next_num_frames > 1:
+                num_frames_to_shift = random.randint(-(last_num_frames - 1), (next_num_frames - 1))
+            else:
+                num_frames_to_shift = 0
+            if num_frames_to_shift == 0 and content_to_replace == correct_assistant['content']:
+                return conversation
+            if content_to_replace == '':
+                return conversation[:i] + conversation[i+1:]
+            augmented = []
+            if num_frames_to_shift != 0:
+                augmented.append({'role': 'stream', 'learn': False, 'num_frames': conversation[i-1]['num_frames'] + num_frames_to_shift})
+            else:
+                augmented.append(conversation[i-1])
+            augmented.append({'role': 'assistant', 'learn': False, 'content': content_to_replace})
+            if num_frames_to_shift != 0:
+                augmented.append({'role': 'stream', 'learn': False, 'num_frames': conversation[i+1]['num_frames'] - num_frames_to_shift})
+            else:
+                augmented.append(conversation[i+1])
+            conversation = conversation[:i-1] + augmented + conversation[i+2:]
         return conversation
-    
+
     def max_frames_clip(self, conversation: list[dict], load_ranges: dict[str, range], max_num_frames: int):
         cum_num_frames = 0
         for i, message in enumerate(conversation):
@@ -82,15 +58,10 @@ class StreamMixIn(torch.utils.data.Dataset):
                 cum_num_frames += message['num_frames']
         return conversation, load_ranges
 
-    def __getitem__(self, *, conversation: list[dict], load_ranges: dict[str, range] | torch.Tensor = None, add_generation_prompt=False, **kwargs):
+    def __getitem__(self, *, conversation: list[dict], load_ranges: dict[str, range], add_generation_prompt=False, **kwargs):
         # 1. load visual encoding
-        if isinstance(load_ranges, torch.Tensor):
-            frames = load_ranges
-        elif load_ranges is not None:
-            conversation, load_ranges = self.max_frames_clip(conversation, load_ranges, self.max_num_frames)
-            frames = torch.cat([torch.load(path, weights_only=True)[ranger] for path, ranger in load_ranges.items()])
-        else:
-            frames = torch.tensor([])
+        conversation, load_ranges = self.max_frames_clip(conversation, load_ranges, self.max_num_frames)
+        frames = torch.cat([torch.load(path)[ranger] for path, ranger in load_ranges.items()])
         # 2. prepare texts
         if self.augmentation:
             conversation = self.augment(conversation)

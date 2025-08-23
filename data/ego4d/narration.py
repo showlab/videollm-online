@@ -1,16 +1,19 @@
 import os, torch, json, tqdm, collections, random
-from transformers import EvalPrediction
+from transformers import EvalPrediction, AutoTokenizer
 
 from .ego4d import Ego4D
 from ..stream import StreamMixIn
-from ..utils import ceil_time_by_fps, DictWithTo
+from ..utils import ceil_time_by_fps, rand_bool, DictWithTo
 
 class Ego4DNarrationStream(Ego4D, StreamMixIn):
     benchmarks_with_keys = {
         'goalstep': 'videos', 'fho_lta': 'clips', 'nlq': 'videos', 'moments': 'videos',
         'av': 'videos', 'fho_oscc-pnr': 'clips', 'fho_sta': 'annotations', 'vq': 'videos'
     }
-    instructions = [{"role": "user", "content": "Please concisely narrate the video in real time. Use the tag 'C' to denote the camera wearer, and other letter tags, such as 'X', to denote other individuals in the scene."}]
+    user_instructions = [{
+        "role": "user",
+        "content": "Please narrate the video in real time. Use the tag 'C' to denote the camera wearer, and other letter tags, such as 'X', to denote other individuals in the scene."
+    }]
     evaluation_kwargs = DictWithTo(evaluator='stream_evaluate')
 
     def get_annos(self, split: str) -> dict[str, dict[str, list]]:
@@ -103,9 +106,7 @@ class Ego4DNarrationStream(Ego4D, StreamMixIn):
                 })
 
     def preprocess_conversation(self, conversation):
-        assert conversation[0]['role'] == 'stream' and conversation[0]['num_frames'] == 1
-        conversation[0]['learn'] = False
-        return conversation[:1] + [random.choice(self.instructions)] + conversation[1:] # first is stream
+        return [random.choice(self.user_instructions)] + conversation
 
     def __getitem__(self, index):
         anno = self.annos[index]
@@ -145,17 +146,17 @@ def build_ego4d_narration_stream_val(**kwargs):
     return Ego4DNarrationStream(split='val', **kwargs)
 
 class Ego4DRefinedNarrationStream(Ego4DNarrationStream):
-    instructions = [
-        {"role": "user", "content": "Please concisely narrate the video in real time."},
-        {"role": "user", "content": "Help me to illustrate my view in short."},
-        {"role": "user", "content": "Please simply describe what do you see."},
-        {"role": "user", "content": "Continuously answer what you observed with simple text."},
-        {"role": "user", "content": "Do concise real-time narration."},
-        {"role": "user", "content": "Hey assistant, do you know the current video content? Reply me concisely."},
-        {"role": "user", "content": "Simply interpret the scene for me."},
-        {"role": "user", "content": "What can you tell me about? Be concise."},
-        {"role": "user", "content": "Use simple text to explain what is shown in front of me."},
-        {"role": "user", "content": "What is the action now? Please response in short."},
+    user_instructions = [
+        {"role": "user", "content": "Please narrate the video in real time."},
+        {"role": "user", "content": "Help me to illustrate my view."},
+        {"role": "user", "content": "Please describe what do you see."},
+        {"role": "user", "content": "Continuously answer what you observed."},
+        {"role": "user", "content": "Do real-time narration."},
+        {"role": "user", "content": "Hey assistant, do you know the current video content?"},
+        {"role": "user", "content": "Interpret the scene for me."},
+        {"role": "user", "content": "What can you tell me about my surroundings?"},
+        {"role": "user", "content": "Explain what is shown in front of me."},
+        {"role": "user", "content": "What is the action now?"},
     ]
 
     def get_annos(self, split: str) -> dict:
