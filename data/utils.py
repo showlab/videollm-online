@@ -76,7 +76,7 @@ def distributed_ffmpeg(*, src_root: str, fps: int = None, resolution: int = None
         dst_root += f'_{fps}fps'
     if resolution is not None:
         assert (pad is not None)
-        dst_root += f'_max{resolution}'
+        dst_root += f'_{resolution}'
     for i, src_path in tqdm.tqdm(enumerate(src_paths), desc=f'{src_root} -> {dst_root}'):
         if i % env.num_tasks != env.global_rank:
             continue
